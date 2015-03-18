@@ -1,0 +1,127 @@
+{
+  "variables": {
+    "vcpus": "2",
+    "vram": "2048"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "name": "trusty64-vbox",
+      "boot_command": [
+        "<esc><wait>",
+        "linux noapic preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg <wait>",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us <wait>",
+        "hostname={{ .Name }} <wait>",
+        "fb=false debconf/frontend=noninteractive <wait>",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=us keyboard-configuration/variant=us console-setup/ask_detect=false <wait>",
+        "initrd=initrd.gz -- <enter><wait>"
+      ],
+      "boot_wait": "3s",
+      "disk_size": 10140,
+      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+      "guest_os_type": "Ubuntu_64",
+      "http_directory": "http",
+      "iso_checksum": "c4dc60982d41faefb4590cf860ec5a13",
+      "iso_checksum_type": "md5",
+      "iso_url": "http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/utopic-netboot/mini.iso",
+
+      "shutdown_command": "echo 'vagrant' | sudo -S -E shutdown -P now",
+      "shutdown_timeout": "2m",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "{{user `vcpus`}}"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "{{user `vram`}}"
+        ]
+      ],
+      "virtualbox_version_file": ".vbox_version"
+    },
+    {
+      "type": "vmware-iso",
+      "name": "trusty64-vmw",
+      "boot_command": [
+        "<esc><wait>",
+        "linux noapic preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg <wait>",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us <wait>",
+        "hostname={{ .Name }} <wait>",
+        "fb=false debconf/frontend=noninteractive <wait>",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=us keyboard-configuration/variant=us console-setup/ask_detect=false <wait>",
+        "initrd=initrd.gz -- <enter><wait>"
+      ],
+      "boot_wait": "3s",
+      "disk_size": 10140,
+      "guest_os_type": "ubuntu",
+      "http_directory": "http",
+      "iso_checksum": "c4dc60982d41faefb4590cf860ec5a13",
+      "iso_checksum_type": "md5",
+      "iso_url": "http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/utopic-netboot/mini.iso",
+      "shutdown_command": "echo 'vagrant' | sudo -S -E shutdown -P now",
+      "shutdown_timeout": "2m",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "vmx_data": {
+        "numvcpus": "{{user `vcpus`}}",
+        "memsize": "{{user `vram`}}"
+      }
+    },
+    {
+      "type": "parallels-iso",
+      "name": "trusty64-prl",
+      "boot_command": [
+        "<esc><wait>",
+        "linux noapic preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg <wait>",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us <wait>",
+        "hostname={{ .Name }} <wait>",
+        "fb=false debconf/frontend=noninteractive <wait>",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=us keyboard-configuration/variant=us console-setup/ask_detect=false <wait>",
+        "initrd=initrd.gz -- <enter><wait>"
+      ],
+      "boot_wait": "3s",
+      "disk_size": 10140,
+      "guest_os_type": "ubuntu",
+      "http_directory": "http",
+      "iso_checksum": "c4dc60982d41faefb4590cf860ec5a13",
+      "iso_checksum_type": "md5",
+      "iso_url": "http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/utopic-netboot/mini.iso",
+      "shutdown_command": "echo 'vagrant' | sudo -S -E shutdown -P now",
+      "shutdown_timeout": "2m",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "parallels_tools_mode": "disable",
+      "prlctl": [
+        ["set", "{{.Name}}", "--cpus", "{{user `vcpus`}}"],
+        ["set", "{{.Name}}", "--memsize", "{{user `vram`}}"]
+      ]
+    }
+  ],
+  "post-processors": [
+    "vagrant"
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'",
+      "override": {
+        "trusty64-vbox": { "scripts": ["scripts/postinstall.sh"] },
+        "trusty64-prl": { "scripts": ["scripts/postinstall.sh"] },
+        "trusty64-vmw": { "scripts": ["scripts/postinstall.sh"] }
+      }
+    }
+  ]
+}
+
