@@ -1,4 +1,8 @@
 packer-templates
 ================
 
-My collection of Packer (http://www.packer.io) templates, used mostly with VBox and Vagrant.
+Templates to produce Vagrant Ubuntu boxes for Virtualbox, VMWare, and Parallels.
+
+Clone me and run:
+
+    packer build template.json
