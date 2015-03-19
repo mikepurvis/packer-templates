@@ -1,7 +1,9 @@
 {
   "variables": {
-    "vcpus": "2",
-    "vram": "2048"
+    "vcpus": "1",
+    "vram": "512",
+    "iso_url": "http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/utopic-netboot/mini.iso",
+    "iso_md5": "c4dc60982d41faefb4590cf860ec5a13"
   },
   "builders": [
     {
@@ -21,9 +23,9 @@
       "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
       "guest_os_type": "Ubuntu_64",
       "http_directory": "http",
-      "iso_checksum": "c4dc60982d41faefb4590cf860ec5a13",
+      "iso_checksum": "{{ user `iso_md5` }}",
       "iso_checksum_type": "md5",
-      "iso_url": "http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/utopic-netboot/mini.iso",
+      "iso_url": "{{ user `iso_url` }}",
 
       "shutdown_command": "echo 'vagrant' | sudo -S -E shutdown -P now",
       "shutdown_timeout": "2m",
@@ -63,9 +65,9 @@
       "disk_size": 10140,
       "guest_os_type": "ubuntu",
       "http_directory": "http",
-      "iso_checksum": "c4dc60982d41faefb4590cf860ec5a13",
+      "iso_checksum": "{{ user `iso_md5` }}",
       "iso_checksum_type": "md5",
-      "iso_url": "http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/utopic-netboot/mini.iso",
+      "iso_url": "{{ user `iso_url` }}",
       "shutdown_command": "echo 'vagrant' | sudo -S -E shutdown -P now",
       "shutdown_timeout": "2m",
       "ssh_username": "vagrant",
@@ -82,27 +84,29 @@
       "name": "trusty64-prl",
       "boot_command": [
         "<esc><wait>",
-        "linux noapic preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg <wait>",
-        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us <wait>",
-        "hostname={{ .Name }} <wait>",
-        "fb=false debconf/frontend=noninteractive <wait>",
-        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=us keyboard-configuration/variant=us console-setup/ask_detect=false <wait>",
-        "initrd=initrd.gz -- <enter><wait>"
+        "linux noapic preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        "hostname={{ .Name }} ",
+        "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=us ",
+        "keyboard-configuration/variant=us console-setup/ask_detect=false ",
+        "initrd=initrd.gz -- <enter>"
       ],
       "boot_wait": "3s",
       "disk_size": 10140,
       "guest_os_type": "ubuntu",
       "http_directory": "http",
-      "iso_checksum": "c4dc60982d41faefb4590cf860ec5a13",
+      "iso_checksum": "{{ user `iso_md5` }}",
       "iso_checksum_type": "md5",
-      "iso_url": "http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/utopic-netboot/mini.iso",
+      "iso_url": "{{ user `iso_url` }}",
       "shutdown_command": "echo 'vagrant' | sudo -S -E shutdown -P now",
       "shutdown_timeout": "2m",
       "ssh_username": "vagrant",
       "ssh_password": "vagrant",
       "ssh_port": 22,
       "ssh_wait_timeout": "10000s",
-      "parallels_tools_mode": "disable",
+      "parallels_tools_flavor": "lin",
+      "parallels_tools_mode": "upload",
       "prlctl": [
         ["set", "{{.Name}}", "--cpus", "{{user `vcpus`}}"],
         ["set", "{{.Name}}", "--memsize", "{{user `vram`}}"]
@@ -117,9 +121,9 @@
       "type": "shell",
       "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'",
       "override": {
-        "trusty64-vbox": { "scripts": ["scripts/postinstall.sh"] },
-        "trusty64-prl": { "scripts": ["scripts/postinstall.sh"] },
-        "trusty64-vmw": { "scripts": ["scripts/postinstall.sh"] }
+        "trusty64-vbox": { "scripts": ["scripts/general.sh", "scripts/virtualbox-tools.sh"] },
+        "trusty64-prl": { "scripts": ["scripts/general.sh", "scripts/parallels-tools.sh"] },
+        "trusty64-vmw": { "scripts": ["scripts/general.sh"] }
       }
     }
   ]
